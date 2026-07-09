@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>@title</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0" />
+    @{ctx.vite_assets(['assets/global.css', 'assets/main.ts'])}
+  </head>
+  <body>
+    <main class="card">
+      <p class="eyebrow">veb starter</p>
+      <h1>@title</h1>
+      <p>@message</p>
+      <p class="hint">Try <code>GET /health</code> for a plain-text response.</p>
+    </main>
+  </body>
+</html>
