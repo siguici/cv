@@ -3,42 +3,70 @@
 import { $ } from "bun";
 import path from "node:path";
 
-const HOOK_PATH = path.resolve(".vite-hooks/_/prepare-commit-msg");
+const HOOKS_DIR = path.resolve(".vite-hooks");
+const HOOK_PATH = path.join(HOOKS_DIR, "_", "prepare-commit-msg");
 
-await configureVitePlus();
-await initializeGitmoji();
-await patchGitmojiHook();
+async function main() {
+  await ensureViteHooks();
+  await ensureGitmojiHook();
+  await ensureBunHook();
 
-async function configureVitePlus() {
+  console.log("✓ Project is ready.");
+}
+
+async function ensureViteHooks() {
+  if (await Bun.file(HOOK_PATH).exists()) {
+    console.log("✓ Vite+ hooks already configured.");
+    return;
+  }
+
   console.log("→ Configuring Vite+...");
   await $`vp config`;
 }
 
-async function initializeGitmoji() {
-  console.log("→ Installing Gitmoji hook...");
-  await $`gitmoji -i`;
-}
-
-async function patchGitmojiHook() {
+async function ensureGitmojiHook() {
   const file = Bun.file(HOOK_PATH);
 
   if (!(await file.exists())) {
-    throw new Error(`Gitmoji hook not found: ${HOOK_PATH}`);
+    throw new Error("prepare-commit-msg hook not found.");
   }
 
-  const original = await file.text();
+  const content = await file.text();
 
-  const patched = original.replace(
-    /npx -c "gitmoji --hook \$1 \$2"/,
-    'if command -v bun >/dev/null 2>&1; then\n  bunx gitmoji --hook "$1" "$2"\nelse\n  gitmoji --hook "$1" "$2"\nfi',
-  );
-
-  if (patched === original) {
-    console.log("✓ Gitmoji hook already patched.");
+  if (content.includes("gitmoji --hook")) {
+    console.log("✓ Gitmoji already installed.");
     return;
   }
+
+  console.log("→ Installing Gitmoji...");
+  await $`gitmoji -i`;
+}
+
+async function ensureBunHook() {
+  const file = Bun.file(HOOK_PATH);
+
+  const content = await file.text();
+
+  if (content.includes("bunx gitmoji")) {
+    console.log("✓ Gitmoji hook already configured for Bun.");
+    return;
+  }
+
+  const patched = content
+    .replace(/npx -v/g, "bun -v")
+    .replace(/npx -c "gitmoji --hook \$1 \$2"/, 'bunx gitmoji --hook "$1" "$2"')
+    .replace(/npx -c/g, "bunx");
+
+  if (patched === content) {
+    console.warn("⚠ Unable to patch Gitmoji hook (unexpected format).");
+    return;
+  }
+
+  console.log("→ Configuring Gitmoji for Bun...");
 
   await Bun.write(file, patched);
 
   console.log("✓ Gitmoji hook configured for Bun.");
 }
+
+await main();
