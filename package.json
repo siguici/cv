@@ -3,14 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vp build",
-    "check": "v fmt -verify . && vp check && knip",
-    "dev": "conc \"v -d veb_livereload watch --only-watch=*.v,*.html,*.css,*.ts,*.md,*.tr run .\" \"bun vp dev\"",
+    "check": "tsc --noEmit && vp check && knip",
+    "dev": "bun vp dev",
     "fix": "knip --fix && vp check --fix",
     "prepare": "bun scripts/prepare.ts",
-    "preview": "bun run build && bun run serve",
-    "prod": "bun run build && v -prod .",
-    "serve": "v run ."
+    "prod": "vp build"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.2",

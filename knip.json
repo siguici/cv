@@ -1,9 +1,9 @@
 {
   "$schema": "./node_modules/knip/schema.json",
   "entry": ["assets/main.ts", "assets/global.css"],
-  "project": [".*config.ts", "**/*.tsx?", "!**/*.{deno.ts,bun.ts,node.cts,node.ts}"],
-  "ignoreBinaries": ["v"],
+  "project": ["*.config.ts"],
+  "ignoreBinaries": [],
   "ignore": [],
-  "ignoreDependencies": [],
+  "ignoreDependencies": ["concurrently"],
   "tags": ["-lintignore"]
 }
