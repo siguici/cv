@@ -7,7 +7,7 @@
     "check": "v fmt -verify . && vp check && knip",
     "dev": "conc \"v -d veb_livereload watch --only-watch=*.v,*.html,*.css,*.ts,*.md,*.tr run .\" \"bun vp dev\"",
     "fix": "knip --fix && vp check --fix",
-    "prepare": "vp config && gitmoji -i && bun scripts/patch-gitmoji-hook.ts",
+    "prepare": "bun scripts/prepare.ts",
     "preview": "bun run build && bun run serve",
     "prod": "bun run build && v -prod .",
     "serve": "v run ."
