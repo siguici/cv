@@ -25,17 +25,27 @@ dev:
 # Production
 ###############################################################################
 
+[unix]
+_binary:
+  if [ ! -x ./cv ]; then just prod; fi
+
+[windows]
+_binary:
+  if (!(Test-Path .\cv.exe)) { just prod }
+
 prod:
   bun prod
   v -prod .
 
 [unix]
-serve:
-    ./cv
+serve: _binary
+  ./cv
 
 [windows]
-serve:
-    .\cv.exe
+serve: _binary
+  .\cv.exe
+
+run: prod serve
 
 ###############################################################################
 # Quality
@@ -105,6 +115,6 @@ doctor:
 ci: check prod
 
 ready:
-    git diff --exit-code --quiet
-    just fix
-    just ci
+  git diff --exit-code --quiet
+  just fix
+  just ci
